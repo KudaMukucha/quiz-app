@@ -1,95 +1,74 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client'
+import { questions } from "@/questions";
+import { useState } from "react";
+
 
 export default function Home() {
+  // console.log(questions);
+ 
+  const [currentQuestion,setCurrentQuestion] = useState(0)
+  const [selectedOption,setSelectedOption] = useState("")
+  const question = questions[currentQuestion]
+  const [showAnswer,setShowAnswer] = useState(false)
+  const [score,setScore] = useState(0)
+  const [showResults,setShowResults] = useState(false)
+  const handleOptionSelect=(option)=>{
+    setSelectedOption(option)
+    setShowAnswer(true)
+    if(option === question.answer){
+      setScore((prevScore)=> prevScore + 1)
+      
+    }
+  }
+
+  const handleNextClick=()=>{
+    setCurrentQuestion((prevQn)=> prevQn + 1)
+    setShowAnswer(false)
+    if(currentQuestion == questions.length -1 ){
+      setShowResults(true)
+      setCurrentQuestion(0)
+    }
+  }
+
+  const handleRestartQuiz =()=>{
+    setShowResults(false)
+  }
+  // console.log(selectedOption);
+  // console.log(score);
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+  <>
+    {showResults ? (
+      <div className="quiz-app">
+        <h3 className="score">Your score is {score} out of {questions.length}</h3>
+         <button onClick={handleRestartQuiz}>Start the Quiz Again!</button>
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+    ): 
+    (
+      <div className="quiz-app">
+      <div className="quiz-header">
+         <h2>Awesome Quiz Application</h2>
       </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <div className="quiz-body">
+         <h3>
+         {question.id} {')'} {question.question}
+         </h3>
+         <div className="options">
+            {
+             question.options.map((option,i)=>{
+               return(
+                 <button className={showAnswer && option == question.answer ? 'correctAnswer' : showAnswer && option == selectedOption ? 'wrongAnswer' :''} key={i} onClick={()=> handleOptionSelect(option)}>{option}</button>
+               )
+             })
+            }
+         </div>
       </div>
-    </main>
+      <div className="quiz-footer">
+         <p>{currentQuestion + 1} out of {questions.length}</p>
+         <button className="next" onClick={handleNextClick}>Next</button>
+      </div>
+    </div>
+    )
+    }
+  </>
   );
 }
